@@ -2,7 +2,7 @@ from .settings_common import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['bark.com']
+ALLOWED_HOSTS = ['bark.com', 'barkbankapi-e88bfd94ccc1.herokuapp.com']
 
 # Security settings
 SECURE_SSL_REDIRECT = True
