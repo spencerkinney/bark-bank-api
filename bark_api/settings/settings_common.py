@@ -92,8 +92,8 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "barkbankapi-e88bfd94ccc1.herokuapp.com", # API url
-    "barkbank-e1493dbfdf9d.herokuapp.com" # UI url
+    "https://barkbankapi-e88bfd94ccc1.herokuapp.com",  # API url with https
+    "https://barkbank-e1493dbfdf9d.herokuapp.com"     # UI url with https
 ]
 
 # Database
