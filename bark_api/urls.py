@@ -6,8 +6,13 @@ from drf_yasg import openapi
 from rest_framework import permissions
 import os
 
+# Check if the environment is production
 is_production = os.getenv('DJANGO_PRODUCTION') == 'True'
 
+# Conditionally set the base URL
+base_url = 'https://barkbankapi-e88bfd94ccc1.herokuapp.com/' if is_production else 'http://localhost:8000/'
+
+# Configure the schema view with the conditional URL
 schema_view = get_schema_view(
    openapi.Info(
       title="Bark Banking API",
@@ -17,9 +22,9 @@ schema_view = get_schema_view(
       contact=openapi.Contact(email="contact@barkbank.local"),
       license=openapi.License(name="MIT License"),
    ),
+   url=base_url,  # Set the base URL dynamically
    public=True,
    permission_classes=(permissions.AllowAny,),
-   schemes=['https'] if is_production else ['http'],
 )
 
 urlpatterns = [
