@@ -7,7 +7,7 @@ from rest_framework import permissions
 import os
 
 # Check if the environment is production
-is_production = os.getenv('DJANGO_PRODUCTION') == 'True'
+is_production = os.getenv('DJANGO_PRODUCTION') == True
 
 # Conditionally set the base URL
 base_url = 'https://barkbankapi-e88bfd94ccc1.herokuapp.com/' if is_production else 'http://localhost:8000/'
