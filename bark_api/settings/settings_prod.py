@@ -25,10 +25,3 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DATABASES = {
     'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
-
-# Swagger settings to default to HTTPS
-SWAGGER_SETTINGS = {
-    'SCHEMA_COERCION': {
-        'default': ['https']  # This forces Swagger to use HTTPS for all URLs
-    },
-}

@@ -4,6 +4,9 @@ from rest_framework.authtoken.views import obtain_auth_token
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+import os
+
+is_production = os.getenv('DJANGO_PRODUCTION') == 'True'
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -16,6 +19,7 @@ schema_view = get_schema_view(
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
+   schemes=['https'] if is_production else ['http'],
 )
 
 urlpatterns = [
