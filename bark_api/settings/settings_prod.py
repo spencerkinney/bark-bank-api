@@ -28,6 +28,7 @@ DATABASES = {
 
 # Swagger settings to default to HTTPS
 SWAGGER_SETTINGS = {
-    'USE_SESSION_AUTH': False,
-    'DEFAULT_API_URL': 'https://barkbankapi-e88bfd94ccc1.herokuapp.com/api/',
+    'SCHEMA_COERCION': {
+        'default': ['https']  # This forces Swagger to use HTTPS for all URLs
+    },
 }
