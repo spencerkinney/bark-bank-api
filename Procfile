@@ -1,0 +1,1 @@
+web: waitress-serve --port=$PORT bark_api.wsgi:application

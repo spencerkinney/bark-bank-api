@@ -9,7 +9,7 @@ schema_view = get_schema_view(
    openapi.Info(
       title="Bark Banking API",
       default_version='v1',
-      description="API for Bark Banking operations.\nBark Technologies is a financial technology company, not a bank.",
+      description="API for Bark banking operations.\nBark Technologies is a financial technology company, not a bank.",
       terms_of_service="https://www.google.com/policies/terms/",
       contact=openapi.Contact(email="contact@barkbank.local"),
       license=openapi.License(name="MIT License"),
