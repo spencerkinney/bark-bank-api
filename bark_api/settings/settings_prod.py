@@ -8,6 +8,7 @@ ALLOWED_HOSTS = ['bark.com', 'barkbankapi-e88bfd94ccc1.herokuapp.com']
 
 # Security settings for production
 SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
 CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True

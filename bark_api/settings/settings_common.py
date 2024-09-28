@@ -94,8 +94,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "https://barkbankapi-e88bfd94ccc1.herokuapp.com",  # API url with https
     "https://barkbank-e1493dbfdf9d.herokuapp.com",     # UI url with https
-    "http://barkbankapi-e88bfd94ccc1.herokuapp.com",  # API url with http
-    "http://barkbank-e1493dbfdf9d.herokuapp.com"     # UI url with http
 ]
 
 # Database
