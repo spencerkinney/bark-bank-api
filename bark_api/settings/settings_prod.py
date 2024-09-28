@@ -8,7 +8,6 @@ ALLOWED_HOSTS = ['bark.com', 'barkbankapi-e88bfd94ccc1.herokuapp.com']
 
 # Security settings for production
 SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
 CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -27,4 +26,8 @@ DATABASES = {
     'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
 
-# Additional settings for REST Framework, CORS, etc., inherit from settings_common
+# Swagger settings to default to HTTPS
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'DEFAULT_API_URL': 'https://barkbankapi-e88bfd94ccc1.herokuapp.com/api/',
+}
