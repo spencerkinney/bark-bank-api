@@ -3,31 +3,33 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import transaction
 from django.core.exceptions import ValidationError
+from decimal import Decimal
+
 from .models import User, Account, Transfer
 from .serializers import UserSerializer, AccountSerializer, TransferSerializer, BalanceSerializer, TransferHistorySerializer
-from .permissions import IsAccountOwner
-from decimal import Decimal
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]  # Security: Ensure all endpoints require authentication
 
+    # Security: Restrict users to only view their own user details
     def get_queryset(self):
-        return self.queryset.filter(id=self.request.user.id)  # Security: Users can only access their own data
+        return self.queryset.filter(id=self.request.user.id)
 
 class AccountViewSet(viewsets.ModelViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAccountOwner]  # Security: Ensure account owner access only
+    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can access this view
 
+    # Override to remove user filtering; agents can access all accounts
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)  # Security: Users can only access their own accounts
+        return self.queryset
 
     def perform_create(self, serializer):
         initial_deposit = serializer.validated_data.get('initial_deposit')
         if initial_deposit is None or initial_deposit <= 0:
-            raise ValidationError("Initial deposit must be a positive amount.")  # Validation: Ensure positive initial deposit
+            raise ValidationError("Initial deposit must be a positive amount.")
         serializer.save(user=self.request.user)
 
     @action(detail=True, methods=['get'])
@@ -40,39 +42,35 @@ class AccountViewSet(viewsets.ModelViewSet):
     def transfers(self, request, pk=None):
         account = self.get_object()
         transfers = Transfer.objects.filter(from_account=account) | Transfer.objects.filter(to_account=account)
-        transfers = transfers.order_by('-timestamp')  # Consistency: Ensure ordered transfer history
+        transfers = transfers.order_by('-timestamp')
         serializer = TransferHistorySerializer(transfers, many=True)
         return Response(serializer.data)
 
 class TransferViewSet(viewsets.ModelViewSet):
     queryset = Transfer.objects.all()
     serializer_class = TransferSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]  # Only authenticated users can access this view
 
     @transaction.atomic  # Data Integrity: Ensure atomicity of transfer operations
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
+
         from_account = serializer.validated_data['from_account']
         to_account = serializer.validated_data['to_account']
-        amount = Decimal(serializer.validated_data['amount'])  # Precision: Use Decimal for financial calculations
+        amount = Decimal(serializer.validated_data['amount'])
 
-        if from_account.user != request.user:
-            return Response({"detail": "You don't have permission to transfer from this account."},
-                            status=status.HTTP_403_FORBIDDEN)  # Security: Prevent unauthorized transfers
-
+        # Validation: Prevent same-account transfers
         if from_account == to_account:
-            return Response({"detail": "Cannot transfer to the same account."},
-                            status=status.HTTP_400_BAD_REQUEST)  # Validation: Prevent same-account transfers
+            return Response({"detail": "Cannot transfer to the same account."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Validation: Ensure positive transfer amount
         if amount <= 0:
-            return Response({"detail": "Transfer amount must be positive."},
-                            status=status.HTTP_400_BAD_REQUEST)  # Validation: Ensure positive transfer amount
+            return Response({"detail": "Transfer amount must be positive."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Validation: Check for sufficient funds
         if from_account.balance < amount:
-            return Response({"detail": "Insufficient funds for transfer."},
-                            status=status.HTTP_400_BAD_REQUEST)  # Validation: Check for sufficient funds
+            return Response({"detail": "Insufficient funds for transfer."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             with transaction.atomic():  # Data Integrity: Ensure both operations succeed or fail together
@@ -85,10 +83,9 @@ class TransferViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    # Allow viewing all transfers regardless of the user
     def get_queryset(self):
-        user_accounts = Account.objects.filter(user=self.request.user)
-        return self.queryset.filter(from_account__in=user_accounts) | self.queryset.filter(to_account__in=user_accounts)
-        # Security: Users can only view transfers involving their accounts
+        return self.queryset.order_by('-timestamp')
 
 # TODO: Implement rate limiting to prevent abuse
 # TODO: Add comprehensive logging for all transactions
