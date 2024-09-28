@@ -5,15 +5,11 @@ DEBUG = False
 ALLOWED_HOSTS = ['bark.com', 'barkbankapi-e88bfd94ccc1.herokuapp.com']
 
 # Security settings for production
-SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
-
-# Ensure Django knows it's behind a proxy and should trust the 'X-Forwarded-Proto' header
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Static files settings (ensure Whitenoise is used for serving static files)
 STATIC_URL = "/static/"
