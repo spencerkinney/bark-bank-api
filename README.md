@@ -115,7 +115,6 @@ Authorization: Token your_token_here
 
 - **UI**: [BarkBank UI](https://barkbank-e1493dbfdf9d.herokuapp.com/)
 - **API**: [BarkBank API](https://barkbankapi-e88bfd94ccc1.herokuapp.com/)
-    - [Swagger Documentation](https://barkbankapi-e88bfd94ccc1.herokuapp.com/swagger/)
     - [ReDoc Documentation](https://barkbankapi-e88bfd94ccc1.herokuapp.com/redoc/)
 
 <img src="./ui_screenshot_concept.png" alt="Bark Bank UI Screenshot" width="500"/>
