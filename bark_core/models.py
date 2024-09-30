@@ -1,47 +1,40 @@
+# bark_core/models.py
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.core.validators import URLValidator
 from decimal import Decimal
 from django.utils import timezone
 
 class Account(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='accounts')
-    account_number = models.CharField(max_length=20, unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    account_number = models.CharField(max_length=16, unique=True)
     balance = models.DecimalField(max_digits=19, decimal_places=4, default=0)
-    profile_picture = models.URLField(max_length=1000, blank=True, validators=[URLValidator()])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        indexes = [
-            models.Index(fields=['user', 'account_number']),
-        ]
-
     def __str__(self):
-        return f"{self.account_number} - {self.user.username}"
-
-    def clean(self):
-        super().clean()
-        if self.profile_picture:
-            try:
-                URLValidator()(self.profile_picture)
-            except ValidationError:
-                raise ValidationError("Invalid URL for profile picture")
+        return f"Account {self.account_number[-4:]} - {self.user.username}"
 
     def deposit(self, amount):
+        """Add the given amount to the account's balance."""
         if amount <= 0:
             raise ValidationError("Deposit amount must be positive")
-        self.balance = self.balance + Decimal(amount)
+        self.balance += Decimal(amount)
         self.save(update_fields=['balance', 'updated_at'])
 
     def withdraw(self, amount):
+        """Subtract the given amount from the account's balance."""
         if amount <= 0:
             raise ValidationError("Withdrawal amount must be positive")
         if self.balance < amount:
             raise ValidationError("Insufficient funds")
-        self.balance = self.balance - Decimal(amount)
+        self.balance -= Decimal(amount)
         self.save(update_fields=['balance', 'updated_at'])
+
+    @classmethod
+    def verify_account_number(cls, account_number):
+        """Verify if an account exists by account number."""
+        return cls.objects.filter(account_number=account_number).first()
 
 class Transfer(models.Model):
     from_account = models.ForeignKey(Account, on_delete=models.PROTECT, related_name='transfers_sent')
@@ -55,14 +48,16 @@ class Transfer(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.from_account.account_number} -> {self.to_account.account_number}: {self.amount}"
+        return f"Transfer from Account {self.from_account.id} to Account {self.to_account.id} of amount {self.amount}"
 
     def clean(self):
+        """Ensure the transfer is valid."""
         if self.from_account == self.to_account:
             raise ValidationError("Cannot transfer to the same account")
         if self.amount <= 0:
             raise ValidationError("Transfer amount must be positive")
 
     def save(self, *args, **kwargs):
+        """Validate the transfer before saving."""
         self.full_clean()
         super().save(*args, **kwargs)
