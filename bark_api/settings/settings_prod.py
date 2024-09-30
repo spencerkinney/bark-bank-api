@@ -24,6 +24,6 @@ DATABASES = {
 }
 
 CSRF_TRUSTED_ORIGINS = [
-    'barkbankapi-e88bfd94ccc1.herokuapp.com',
-    'barkbank-e1493dbfdf9d.herokuapp.com',
+    'https://barkbankapi-e88bfd94ccc1.herokuapp.com',
+    'https://barkbank-e1493dbfdf9d.herokuapp.com',
 ]
