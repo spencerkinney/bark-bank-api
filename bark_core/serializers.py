@@ -9,13 +9,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
 class AccountSerializer(serializers.ModelSerializer):
-    user = UserSerializer()  # Use UserSerializer to include full user details
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True)  # Accept user_id on POST
+    user_detail = UserSerializer(read_only=True, source='user')  # Use UserSerializer for read operations
     initial_deposit = serializers.DecimalField(max_digits=19, decimal_places=2, write_only=True)
     account_number = serializers.CharField(write_only=True)
 
     class Meta:
         model = Account
-        fields = ['id', 'user', 'account_number', 'balance', 'initial_deposit', 'created_at']
+        fields = ['id', 'user', 'user_detail', 'account_number', 'balance', 'initial_deposit', 'created_at']
         read_only_fields = ['id', 'balance', 'created_at']
 
     def validate_account_number(self, value):
@@ -26,8 +27,8 @@ class AccountSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         initial_deposit = validated_data.pop('initial_deposit')
         account_number = validated_data.pop('account_number')
-        user = validated_data.pop('user')
-        
+        user = validated_data.pop('user')  # This now accepts the user ID
+
         account = Account.objects.create(
             user=user,
             account_number=account_number,
