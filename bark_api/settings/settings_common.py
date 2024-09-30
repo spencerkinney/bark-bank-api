@@ -105,6 +105,3 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-# FerNet Encryption
-ENCRYPTION_KEY= os.environ["ENCRYPTION_KEY"]
