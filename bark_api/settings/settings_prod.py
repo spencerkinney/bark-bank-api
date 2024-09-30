@@ -22,3 +22,8 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 DATABASES = {
     'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    'barkbankapi-e88bfd94ccc1.herokuapp.com',
+    'barkbank-e1493dbfdf9d.herokuapp.com',
+]
